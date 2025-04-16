@@ -1,10 +1,10 @@
 package com.example.gsmspring.controller;
 
 import com.example.gsmspring.entity.Book;
+import com.example.gsmspring.repository.BookRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +12,9 @@ import java.util.List;
 @RestController
 @RequestMapping("/api")
 public class BookController { // new BookController()
+
+    @Autowired
+    private BookRepository bookRepository; // DI(의존성주입)
     // HandlerMapping
     @GetMapping("/")
     public String home(){
@@ -28,5 +31,10 @@ public class BookController { // new BookController()
         list.add(book2);
         list.add(book3);
         return list; // -->HttpMessageConverter-> [ {    },{    }, {     } ]
+    }
+
+    @PostMapping("/books")
+    public Book bookSave(@RequestBody Book book){  // JSON : { "title":"자바", "price":35000 }
+        return bookRepository.save(book);
     }
 }
