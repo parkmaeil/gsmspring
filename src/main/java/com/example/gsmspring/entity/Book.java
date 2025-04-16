@@ -21,4 +21,5 @@ public class Book {
     private String title; // 255 , bookTitle
 
     private int price;
+
 }
