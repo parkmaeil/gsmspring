@@ -4,6 +4,7 @@ import com.example.gsmspring.entity.Book;
 import com.example.gsmspring.payload.BookDTO;
 import com.example.gsmspring.payload.BookViewDTO;
 import com.example.gsmspring.repository.BookRepository;
+import com.example.gsmspring.service.BookService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,7 +22,7 @@ import java.util.Optional;
 public class BookController { // new BookController()
 
     @Autowired
-    private BookRepository bookRepository; // DI(의존성주입)
+    private BookService bookService;
     // HandlerMapping
     @GetMapping("/")
     public String home(){
@@ -30,33 +31,33 @@ public class BookController { // new BookController()
     // GET : http://localhost:8081/api/books
     @GetMapping("/books")
     public List<BookViewDTO> getAllList(){
-        List<Book> books=bookRepository.findAll();
+        List<BookViewDTO> books=bookService.findAll();
         // Book->BookViewDTO : map()
-        List<BookViewDTO> bookView=books.stream().map((book)->{
-          return new BookViewDTO(book.getId(), book.getTitle());
-        }).toList();
         // 순환참조문제 발생 -> 해결(DTO)
-        return bookView; // -->HttpMessageConverter-> [ {    },{    }, {     } ]
+        return books; // -->HttpMessageConverter-> [ {    },{    }, {     } ]
     }
     // POST : http://localhost:8081/api/books
     @PostMapping("/books")
     public Book bookSave(@RequestBody BookDTO reqBook){  // JSON : { "title":"자바", "price":35000 }
         // BookDTO -> Book
-        Book book=new Book();
-        book.setTitle(reqBook.getTitle());
-        book.setPrice(reqBook.getPrice());
-        return bookRepository.save(book);
+        return bookService.save(reqBook);
     }
 
     // GET : http://localhost:8081/api/books/3
     @GetMapping("/books/{id}")
     public ResponseEntity<?> getById(@PathVariable Long id){
-       Optional<Book> optional=bookRepository.findById(id);
-       if(!optional.isPresent()){
-           throw new RuntimeException("데이터가 없습니다.");
-       }
-       Book book=optional.get();
+        Book book=bookService.findById(id);
        //BookViewDTO
        return new ResponseEntity<>(book, HttpStatus.OK); // JSON ?
+    }
+
+    @PutMapping("/books/{id}") // == @PostMapping("/books")
+    public Book save(@PathVariable Long id, @RequestBody BookDTO reqBook){
+         return bookService.save(id, reqBook);
+    }
+
+    @DeleteMapping("/books/{id}")
+    public void bookDelete(@PathVariable Long id){
+        bookService.deleteById(id);
     }
 }
