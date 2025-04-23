@@ -5,6 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.List;
+
 // Lombok API
 @Getter
 @Setter
@@ -12,7 +15,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Entity // table 메핑 -> create table book~
 // Book(Object)->Table(R) Mapping : ORM 기술
-public class Book {
+public class Book {  // 책(1) - 리뷰(N)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; //PK : 1,2,3,4~~~
@@ -22,4 +25,6 @@ public class Book {
 
     private int price;
 
+    @OneToMany(mappedBy = "book")
+    private List<Review> reviews;
 }
