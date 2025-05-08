@@ -1,8 +1,10 @@
 package com.example.gsmspring.service;
 
 import com.example.gsmspring.entity.Book;
+import com.example.gsmspring.entity.Review;
 import com.example.gsmspring.payload.BookDTO;
 import com.example.gsmspring.payload.BookViewDTO;
+import com.example.gsmspring.payload.ReviewDTO;
 import com.example.gsmspring.repository.BookRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,10 +26,20 @@ public class BookService { //new BookService()
     // 책 전체 목록 가져오기 - method
     @Transactional(readOnly = true)
     public List<BookViewDTO> findAll(){
-        List<Book> books=bookRepository.findAll();
+        // SQL 1번 : select * from book;
+        List<Book> books=bookRepository.findAll(); // 책3권의 정보만 가져온다.
         // Book(Entity)-연관관계
         List<BookViewDTO> bookView=books.stream().map((book)->{
-            return new BookViewDTO(book.getId(), book.getTitle());
+            // 3000권의 책에 대한 3번의 SQL이 전송
+            // N             N번 : N+1문제 -> 해결? 1. FETCH JOIN, 2. @EntityGraph
+            //             1번책의 리뷰가 2개->DB에서 데이터를 가지고 와야 한다.
+            //                        1->select * from review where book_id=1;
+            //                        2->select * from review where book_id=2;
+            //                        3->select * from review where book_id=3;
+            List<ReviewDTO> reviewsDTO=book.getReviews().stream().map((review)->{
+               return new ReviewDTO(review.getId(), review.getCost(), review.getCreatedAt());
+            }).toList();
+            return new BookViewDTO(book.getId(), book.getTitle(), reviewsDTO);
         }).toList();
         return bookView; // 순환참조 문제 해결
     }

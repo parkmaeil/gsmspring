@@ -23,7 +23,11 @@ public class Review { // 리뷰(N) - 책(1)
     private int cost; // 1~5(평점)
     private LocalDateTime createdAt; // 작성일
 
-    @ManyToOne
+    @PrePersist
+    public void onCreate(){
+        this.createdAt=LocalDateTime.now(); // 시스템 날짜정보
+    }
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "book_id") // FK ->Book 테이블의 PK(id)
     private Book book;
 }

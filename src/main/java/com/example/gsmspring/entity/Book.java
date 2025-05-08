@@ -24,7 +24,7 @@ public class Book {  // 책(1) - 리뷰(N)
     private String title; // 255 , bookTitle
 
     private int price;
-
-    @OneToMany(mappedBy = "book")
+    // 지연로딩
+    @OneToMany(mappedBy = "book", fetch = FetchType.LAZY)
     private List<Review> reviews;
 }
